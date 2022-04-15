@@ -39,305 +39,305 @@
     "training": [
         {
             "image": "/home/qinyi/dataset/train/train/image/0050.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0050/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0050/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0012.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0012/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0012/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0039.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0039/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0039/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0051.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0051/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0051/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0001.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0001/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0001/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0056.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0056/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0056/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0060.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0060/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0060/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0019.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0019/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0019/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0033.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0033/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0033/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0036.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0036/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0036/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0059.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0059/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0059/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0003.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0003/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0003/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0052.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0052/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0052/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0037.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0037/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0037/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0057.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0057/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0057/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0055.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0055/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0055/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0044.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0044/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0044/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0068.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0068/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0068/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0027.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0027/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0027/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0062.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0062/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0062/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0021.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0021/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0021/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0004.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0004/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0004/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0054.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0054/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0054/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0063.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0063/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0063/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0026.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0026/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0026/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0066.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0066/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0066/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0005.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0005/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0005/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0043.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0043/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0043/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0015.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0015/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0015/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0041.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0041/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0041/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0014.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0014/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0014/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0025.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0025/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0025/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0040.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0040/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0040/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0017.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0017/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0017/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0031.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0031/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0031/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0034.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0034/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0034/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0010.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0010/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0010/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0046.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0046/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0046/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0067.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0067/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0067/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0032.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0032/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0032/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0038.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0038/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0038/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0065.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0065/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0065/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0011.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0011/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0011/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0048.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0048/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0048/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0049.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0049/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0049/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0058.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0058/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0058/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0007.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0007/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0007/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0035.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0035/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0035/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0069.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0069/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0069/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0008.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0008/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0008/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0006.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0006/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0006/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0029.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0029/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0029/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0045.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0045/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0045/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0018.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0018/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0018/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0022.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0022/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0022/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0020.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0020/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0020/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0013.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0013/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0013/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0053.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0053/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0053/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0023.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0023/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0023/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0047.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0047/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0047/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0000.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0000/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0000/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0042.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0042/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0042/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0028.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0028/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0028/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0009.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0009/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0009/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0024.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0024/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0024/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/train/image/0061.nii.gz",
-            "label": "/home/qinyi/dataset/train/train/newgt/0061/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/train/newgt/0061/Submandibular.nii.gz"
         }
     ],
     "validation": [
         {
             "image": "/home/qinyi/dataset/train/valid/image/0074.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0074/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0074/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0076.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0076/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0076/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0077.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0077/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0077/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0073.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0073/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0073/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0078.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0078/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0078/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0070.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0070/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0070/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0071.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0071/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0071/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0075.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0075/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0075/Submandibular.nii.gz"
         },
         {
             "image": "/home/qinyi/dataset/train/valid/image/0072.nii.gz",
-            "label": "/home/qinyi/dataset/train/valid/newgt/0072/Parotid.nii.gz"
+            "label": "/home/qinyi/dataset/train/valid/newgt/0072/Submandibular.nii.gz"
         }
     ]
 }

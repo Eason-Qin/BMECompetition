@@ -109,7 +109,7 @@ def main():
     model.to(device)
     start_time = time.time()
     with torch.no_grad():
-        '''dice_list_case = []
+        dice_list_case = []
         for i, batch in enumerate(val_loader):
             val_inputs, val_labels = (batch["image"].cuda(), batch["label"].cuda())
             img_name = batch['image_meta_dict']['filename_or_obj'][0].split('/')[-1]
@@ -140,8 +140,9 @@ def main():
             mean_dice = np.mean(dice_list_sub)
             print("Mean Organ Dice: {}".format(mean_dice))
             dice_list_case.append(mean_dice)
-        print("Overall Mean Dice: {}".format(np.mean(dice_list_case)))'''
-        for idx, batch_data in enumerate(val_loader):
+            torch.cuda.empty_cache()
+        print("Overall Mean Dice: {}".format(np.mean(dice_list_case)))
+        '''for idx, batch_data in enumerate(val_loader):
             if isinstance(batch_data, list):
                 data, target = batch_data
             else:
@@ -187,6 +188,7 @@ def main():
                 avg_acc = np.mean([np.nanmean(l) for l in acc_list])
             print('acc', avg_acc,'time {:.2f}s'.format(time.time() - start_time))
             start_time = time.time()
+            torch.cuda.empty_cache()'''
 
 if __name__ == '__main__':
     main()

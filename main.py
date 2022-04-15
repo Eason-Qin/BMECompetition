@@ -23,6 +23,8 @@ from monai.metrics import DiceMetric
 from monai.utils.enums import MetricReduction
 from monai.transforms import AsDiscrete,Activations,Compose
 from networks.unetr import UNETR
+from monai.networks.nets import UNet
+from monai.networks.nets import SegResNet
 from utils.data_utils import get_loader
 from trainer import run_training
 from optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
@@ -148,8 +150,23 @@ def main_worker(gpu, args):
                 print('Training from pre-trained checkpoint does not support AMP\nAMP is disabled.')
                 args.amp = args.noamp
             model = torch.jit.load(os.path.join(pretrained_dir, args.pretrained_model_name))
-    else:
-        raise ValueError('Unsupported model ' + str(args.model_name))
+    if (args.model_name is None) or args.model_name == 'unet':
+        model = UNet(
+            spatial_dims=3,
+            in_channels=args.in_channels,
+            out_channels=args.out_channels,
+            channels=(4,8,16,32,64),
+            strides=(2,2,2,2),
+            kernel_size=3,
+            up_kernel_size=3,
+            num_res_units=0,
+            )
+    if (args.model_name is None) or args.model_name == 'segres':
+        model = SegResNet(
+            spatial_dims=3,
+            in_channels=args.in_channels,
+            out_channels=args.out_channels,
+            upsample_mode="deconv")
 
     dice_loss = DiceCELoss(to_onehot_y=True,
                            softmax=True,
