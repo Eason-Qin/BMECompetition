@@ -37,6 +37,7 @@ parser.add_argument('--logdir', default='test', type=str, help='directory to sav
 parser.add_argument('--pretrained_dir', default='./pretrained_models/', type=str, help='pretrained checkpoint directory')
 parser.add_argument('--data_dir', default='/dataset/dataset0/', type=str, help='dataset directory')
 parser.add_argument('--json_list', default='dataset_0.json', type=str, help='dataset json file')
+parser.add_argument('--save', default='model.pth', type=str, help='dataset json file')
 parser.add_argument('--pretrained_model_name', default='UNETR_model_best_acc.pth', type=str, help='pretrained model name')
 parser.add_argument('--save_checkpoint', action='store_true', help='save checkpoint during training')
 parser.add_argument('--max_epochs', default=5000, type=int, help='max number of training epochs')
@@ -88,6 +89,7 @@ parser.add_argument('--resume_ckpt', action='store_true', help='resume training 
 parser.add_argument('--resume_jit', action='store_true', help='resume training from pretrained torchscript checkpoint')
 parser.add_argument('--smooth_dr', default=1e-6, type=float, help='constant added to dice denominator to avoid nan')
 parser.add_argument('--smooth_nr', default=0.0, type=float, help='constant added to dice numerator to avoid zero')
+parser.add_argument('--gpus', type=int,default=0)
 
 
 def main():
@@ -102,7 +104,7 @@ def main():
                  nprocs=args.ngpus_per_node,
                  args=(args,))
     else:
-        main_worker(gpu=0, args=args)
+        main_worker(gpu=args.gpus, args=args)
 
 def main_worker(gpu, args):
 

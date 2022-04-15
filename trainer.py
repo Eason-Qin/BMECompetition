@@ -226,7 +226,7 @@ def run_training(model,
                                 filename='model_final.pth')
         if (epoch+1) % args.val_every == 0:
             torch.cuda.empty_cache() 
-            torch.save(model,'modelu_P.pth')
+            torch.save(model,args.save)
             if args.distributed:
                 torch.distributed.barrier()
             epoch_time = time.time()
