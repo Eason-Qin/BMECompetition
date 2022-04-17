@@ -48,7 +48,7 @@ parser.add_argument('--optim_name', default='adamw', type=str, help='optimizatio
 parser.add_argument('--reg_weight', default=1e-5, type=float, help='regularization weight')
 parser.add_argument('--momentum', default=0.99, type=float, help='momentum')
 parser.add_argument('--noamp', action='store_true', help='do NOT use amp for training')
-parser.add_argument('--val_every', default=1, type=int, help='validation frequency')
+parser.add_argument('--val_every', default=10, type=int, help='validation frequency')
 parser.add_argument('--distributed', action='store_true', help='start distributed training')
 parser.add_argument('--world_size', default=1, type=int, help='number of nodes for distributed training')
 parser.add_argument('--rank', default=0, type=int, help='node rank for distributed training')
