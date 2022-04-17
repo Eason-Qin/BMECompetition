@@ -90,6 +90,19 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     pretrained_pth = os.path.join(pretrained_dir, model_name)
     model=torch.load(pretrained_pth)
+    model = UNETR(
+            in_channels=args.in_channels,
+            out_channels=args.out_channels,
+            img_size=(args.roi_x, args.roi_y, args.roi_z),
+            feature_size=args.feature_size,
+            hidden_size=args.hidden_size,
+            mlp_dim=args.mlp_dim,
+            num_heads=args.num_heads,
+            pos_embed=args.pos_embed,
+            norm_name=args.norm_name,
+            conv_block=True,
+            res_block=True,
+            dropout_rate=args.dropout_rate)
     inf_size = [args.roi_x, args.roi_y, args.roi_x]
     post_label = AsDiscrete(to_onehot=True,
                             n_classes=args.out_channels)
@@ -105,6 +118,8 @@ def main():
                             predictor=model,
                             overlap=args.infer_overlap)
 
+    model_dict = torch.load(os.path.join(pretrained_dir, args.pretrained_model_name))
+    model.load_state_dict(model_dict["state_dict"])
     model.eval()
     model.to(device)
     start_time = time.time()
