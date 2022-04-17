@@ -20,37 +20,9 @@ import torch.nn.parallel
 from utils.utils import distributed_all_gather
 import torch.utils.data.distributed
 from monai.data import decollate_batch
-from monai.transforms import Resize
+from valid_utils import AverageMeter
 
-def dice(x, y):
-    intersect = np.sum(np.sum(np.sum(x * y)))
-    y_sum = np.sum(np.sum(np.sum(y)))
-    if y_sum == 0:
-        print("??")
-        return 0.0
-    x_sum = np.sum(np.sum(np.sum(x)))
-    return 2 * intersect / (x_sum + y_sum)
-
-class AverageMeter(object):
-
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = np.where(self.count > 0,
-                            self.sum / self.count,
-                            self.sum)
-
-
+'''func for training'''
 def train_epoch(model,
                 loader,
                 optimizer,
@@ -58,36 +30,38 @@ def train_epoch(model,
                 epoch,
                 loss_func,
                 args):
-    
+    # set in train mode
     model.train()
     start_time = time.time()
+    # calculate losses
     run_loss = AverageMeter()
     for idx, batch_data in enumerate(loader):
-        torch.cuda.empty_cache()   
+        # clean cuda cached useless grad graph
+        torch.cuda.empty_cache()
+        # try batch_data is a list to select ways of loading. for compatibility
         if isinstance(batch_data, list):
             data, target = batch_data
         else:
             data, target = batch_data['image'], batch_data['label']
-        print(data.shape)
-        '''if data.shape[4]/16!=0:
-            origin_shape=data.shape[4]
-            padding_shape=args.feature_size - origin_shape%args.feature_size
-            padd = torch.zeros(4,1, 96 , 96,padding_shape).float()
-            data = torch.cat((data,padd),3)
-            target = torch.cat((target,padd),3)'''
-        print(data.shape)
+        # set data downstream to cuda 
         data, target = data.cuda(args.rank), target.cuda(args.rank)
+        # set non grad for training
         for param in model.parameters(): param.grad = None
+        # cuda opt
         with autocast(enabled=args.amp):
+            # training and loss calculation
             logits = model(data)
             loss = loss_func(logits, target)
+        # back propagation
         if args.amp:
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
         else:
+            # normal bp
             loss.backward()
             optimizer.step()
+        # collect distrib. ln. data
         if args.distributed:
             loss_list = distributed_all_gather([loss],
                                                out_numpy=True,
@@ -95,7 +69,9 @@ def train_epoch(model,
             run_loss.update(np.mean(np.mean(np.stack(loss_list, axis=0), axis=0), axis=0),
                             n=args.batch_size * args.world_size)
         else:
+            # calculate aver. loss
             run_loss.update(loss.item(), n=args.batch_size)
+        # print data
         if args.rank == 0:
             print('Epoch {}/{} {}/{}'.format(epoch, args.max_epochs, idx, len(loader)),
                   'loss: {:.4f}'.format(run_loss.avg),
@@ -113,9 +89,10 @@ def val_epoch(model,
               model_inferer=None,
               post_label=None,
               post_pred=None):
+    # evalution mode
     model.eval()
     start_time = time.time()
-    
+    # standard evaluation paradigm
     with torch.no_grad():
         for idx, batch_data in enumerate(loader):
             torch.cuda.empty_cache()   
@@ -132,6 +109,7 @@ def val_epoch(model,
             if not logits.is_cuda:
                 target = target.cpu()
             torch.cuda.empty_cache()
+            # calulate metric.
             val_labels_list = decollate_batch(target)
             val_labels_convert = [post_label(val_label_tensor) for val_label_tensor in val_labels_list]
             val_outputs_list = decollate_batch(logits)
@@ -139,6 +117,7 @@ def val_epoch(model,
             acc = acc_func(y_pred=val_output_convert, y=val_labels_convert)
             acc = acc.cuda(args.rank)
 
+            # collect
             if args.distributed:
                 acc_list = distributed_all_gather([acc],
                                                   out_numpy=True,
@@ -146,6 +125,7 @@ def val_epoch(model,
                 avg_acc = np.mean([np.nanmean(l) for l in acc_list])
 
             else:
+                # calculate ave. metric
                 acc_list = acc.detach().cpu().numpy()
                 avg_acc = np.mean([np.nanmean(l) for l in acc_list])
 
@@ -163,6 +143,7 @@ def save_checkpoint(model,
                     best_acc=0,
                     optimizer=None,
                     scheduler=None):
+    # save state dict best epoch and epoch for checkpoint reload
     state_dict = model.state_dict() if not args.distributed else model.module.state_dict()
     save_dict = {
             'epoch': epoch,
@@ -177,6 +158,8 @@ def save_checkpoint(model,
     torch.save(save_dict, filename)
     print('Saving checkpoint', filename)
 
+
+'''core training'''
 def run_training(model,
                  train_loader,
                  val_loader,
@@ -191,20 +174,25 @@ def run_training(model,
                  post_pred=None
                  ):
     writer = None
+    # tensorboard logging
     if args.logdir is not None and args.rank == 0:
         writer = SummaryWriter(log_dir=args.logdir)
         if args.rank == 0: print('Writing Tensorboard logs to ', args.logdir)
+    # cuda opt
     scaler = None
     if args.amp:
         scaler = GradScaler()
     val_acc_max = 0.
+    # epoch iteration
     for epoch in range(start_epoch, args.max_epochs):
         torch.cuda.empty_cache()
+        # distrib. ln. setting
         if args.distributed:
             train_loader.sampler.set_epoch(epoch)
             torch.distributed.barrier()
         print(args.rank, time.ctime(), 'Epoch:', epoch)
         epoch_time = time.time()
+        # training
         train_loss = train_epoch(model,
                                  train_loader,
                                  optimizer,
@@ -215,15 +203,20 @@ def run_training(model,
         if args.rank == 0:
             print('Final training  {}/{}'.format(epoch, args.max_epochs - 1), 'loss: {:.4f}'.format(train_loss),
                   'time {:.2f}s'.format(time.time() - epoch_time))
+
+        # write loss to tbx
         if args.rank==0 and writer is not None:
             writer.add_scalar('train_loss', train_loss, epoch)
         b_new_best = False
+
+        # save model & weight in selected epochs.
         if args.rank == 0 and args.logdir is not None and args.save_checkpoint:
             save_checkpoint(model,
                                 epoch,
                                 args,
                                 best_acc=val_acc_max,
                                 filename='model_final.pth')
+        # evaluate model & weight in selected epochs.
         if (epoch+1) % args.val_every == 0:
             torch.cuda.empty_cache() 
             torch.save(model,args.save)
@@ -238,6 +231,7 @@ def run_training(model,
                                     args=args,
                                     post_label=post_label,
                                     post_pred=post_pred)
+            # write to tbx
             if args.rank == 0:
                 print('Final validation  {}/{}'.format(epoch, args.max_epochs - 1),
                       'acc', val_avg_acc, 'time {:.2f}s'.format(time.time() - epoch_time))
@@ -261,7 +255,8 @@ def run_training(model,
                 if b_new_best:
                     print('Copying to model.pt new best model!!!!')
                     shutil.copyfile(os.path.join(args.logdir, 'model_final.pth'), os.path.join(args.logdir, 'model.pth'))
-
+        
+        # update scheduler
         if scheduler is not None:
             scheduler.step()
 
