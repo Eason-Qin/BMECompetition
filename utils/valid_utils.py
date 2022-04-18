@@ -1,3 +1,4 @@
+import numpy as np
 
 def dice(x, y):
     intersect = np.sum(np.sum(np.sum(x * y)))

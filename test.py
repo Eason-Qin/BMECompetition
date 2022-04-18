@@ -17,7 +17,6 @@ from utils.data_utils import get_loader
 from trainer import dice
 import argparse
 import os
-import matplotlib.pyplot as plt
 import time
 import numpy as np
 import torch
@@ -28,12 +27,15 @@ import torch.nn.parallel
 import torch.utils.data.distributed
 from monai.inferers import sliding_window_inference
 from utils.data_utils import get_loader
-from valid_utils import dice
+from utils.valid_utils import dice
+from utils.visualization import print_cut_samples,print_heatmap
+from utils.slide_saliency_inference import sliding_saliency_inference
 
 parser = argparse.ArgumentParser(description='UNETR segmentation pipeline')
 parser.add_argument('--pretrained_dir', default='./pretrained_models/', type=str, help='pretrained checkpoint directory')
 parser.add_argument('--data_dir', default='./dataset/', type=str, help='dataset directory')
 parser.add_argument('--json_list', default='dataset_0.json', type=str, help='dataset json file')
+parser.add_argument('--save_img', default='test', type=str, help='image cut save file')
 parser.add_argument('--pretrained_model_name', default='UNETR_model_best_acc.pth', type=str, help='pretrained model name')
 parser.add_argument('--saved_checkpoint', default='ckpt', type=str, help='Supports torchscript or ckpt pretrained checkpoint type')
 parser.add_argument('--mlp_dim', default=3072, type=int, help='mlp dimention in ViT encoder')
@@ -75,6 +77,7 @@ def main():
     # load device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # load model
+    sf=SaliencyInferer("CAM","out.conv.conv")
     pretrained_dir = args.pretrained_dir
     model_name = args.pretrained_model_name
     pretrained_pth = os.path.join(pretrained_dir, model_name)
@@ -97,18 +100,17 @@ def main():
                                                    4,
                                                    model,
                                                    overlap=args.infer_overlap)
-            plt.figure("check", (18, 6))
-            plt.subplot(1, 3, 1)
-            plt.title("image")
-            cut = 66
-            plt.imshow(val_inputs.cpu().numpy()[0, 0, :, :, cut], cmap="gray")
-            plt.subplot(1, 3, 2)
-            plt.title("label")
-            plt.imshow(val_labels.cpu().numpy()[0, 0, :, :, cut])
-            plt.subplot(1, 3, 3)
-            plt.title("output")
-            plt.imshow(torch.argmax(val_outputs, dim=1).detach().cpu()[0, :, :, cut])
-            plt.savefig("test1",dpi=300)
+            
+            path=img_name+os.path.split(pretrained_pth,".")[0]
+            print_cut_samples(val_inputs,val_labels,val_outputs,path)
+            salient=sliding_saliency_inference(val_inputs,
+                                                   (96, 96, 96),
+                                                   4,
+                                                   sf,
+                                                   model,
+                                                   overlap=args.infer_overlap)
+            path=img_name+os.path.split(pretrained_pth,".")[0]+"heatmap"
+            print_heatmap(val_inputs,val_labels,val_outputs,salient,path)
             # postprocess softmax->argmax
             val_outputs = torch.softmax(val_outputs, 1).cpu().numpy()
             val_outputs = np.argmax(val_outputs, axis=1).astype(np.uint8)

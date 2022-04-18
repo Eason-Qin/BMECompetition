@@ -180,8 +180,8 @@ class UNETR(nn.Module):
         self.out = UnetOutBlock(spatial_dims=3, in_channels=feature_size, out_channels=out_channels)  # type: ignore
 
     def proj_feat(self, x, hidden_size, feat_size):
-        x = x.view(x.size(0), feat_size[0], feat_size[1], feat_size[2], hidden_size)
-        x = x.permute(0, 4, 1, 2, 3).contiguous()
+        x = x.view(x.size(0), feat_size[0], feat_size[1], feat_size[2], hidden_size) # reshape the feature map into batch 16 16 16 K. At which feat=img//patch
+        x = x.permute(0, 4, 1, 2, 3).contiguous() # channel transpose in order of CHWD, then make the tensor continuous in memory
         return x
 
     def load_from(self, weights):
@@ -205,18 +205,29 @@ class UNETR(nn.Module):
 
 
     def forward(self, x_in):
+        # encoder backbone
         x, hidden_states_out = self.vit(x_in)
+        # Conv333
         enc1 = self.encoder1(x_in)
+        # third layer of vit followed by deconv-conv-bn-relux3
         x2 = hidden_states_out[3]
         enc2 = self.encoder2(self.proj_feat(x2, self.hidden_size, self.feat_size))
+        # sixth layer of vit followed by deconv-conv-bn-relux2
         x3 = hidden_states_out[6]
         enc3 = self.encoder3(self.proj_feat(x3, self.hidden_size, self.feat_size))
+        # ninth layer of vit followed by deconv-conv-bn-relux1
         x4 = hidden_states_out[9]
         enc4 = self.encoder4(self.proj_feat(x4, self.hidden_size, self.feat_size))
+        # twelvth layer of vit followed by deconvx1
         dec4 = self.proj_feat(x, self.hidden_size, self.feat_size)
+        # concat. conv333x2 than upsample
         dec3 = self.decoder5(dec4, enc4)
+        # concat. conv333x2 than upsample
         dec2 = self.decoder4(dec3, enc3)
+        # concat. conv333x2 than upsample
         dec1 = self.decoder3(dec2, enc2)
+        # concat. conv333x2 than upsample
         out = self.decoder2(dec1, enc1)
+        # unet head
         logits = self.out(out)
         return logits
