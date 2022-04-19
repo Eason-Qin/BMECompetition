@@ -81,6 +81,10 @@ parser.add_argument('--pos_embed', default='perceptron', type=str, help='type of
 parser.add_argument('--norm_name', default='instance', type=str, help='normalization layer type in decoder')
 
 def main():
+    dist.init_process_group(backend='nccl',
+                                init_method='tcp://127.0.0.1:23456',
+                                world_size=1,
+                                rank=0)
     torch.cuda.empty_cache() 
     args = parser.parse_args()
     args.test_mode = True
@@ -90,7 +94,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     pretrained_pth = os.path.join(pretrained_dir, model_name)
     model=torch.load(pretrained_pth)
-    model = UNETR(
+    '''model = UNETR(
             in_channels=args.in_channels,
             out_channels=args.out_channels,
             img_size=(args.roi_x, args.roi_y, args.roi_z),
@@ -102,7 +106,7 @@ def main():
             norm_name=args.norm_name,
             conv_block=True,
             res_block=True,
-            dropout_rate=args.dropout_rate)
+            dropout_rate=args.dropout_rate)'''
     inf_size = [args.roi_x, args.roi_y, args.roi_x]
     post_label = AsDiscrete(to_onehot=True,
                             n_classes=args.out_channels)
@@ -118,8 +122,8 @@ def main():
                             predictor=model,
                             overlap=args.infer_overlap)
 
-    model_dict = torch.load(os.path.join(pretrained_dir, args.pretrained_model_name))
-    model.load_state_dict(model_dict["state_dict"])
+    '''model_dict = torch.load(os.path.join(pretrained_dir, args.pretrained_model_name))
+    model.load_state_dict(model_dict["state_dict"])'''
     model.eval()
     model.to(device)
     start_time = time.time()
