@@ -94,8 +94,11 @@ parser.add_argument('--gpus', type=int,default=0)
 
 def main():
     args = parser.parse_args()
+    # opt. for autograd
     args.amp = not args.noamp
+    # log dir
     args.logdir = './runs/' + args.logdir
+    # start distributed learning
     if args.distributed:
         args.ngpus_per_node = torch.cuda.device_count()
         print('Found total gpus', args.ngpus_per_node)
@@ -103,30 +106,41 @@ def main():
         mp.spawn(main_worker,
                  nprocs=args.ngpus_per_node,
                  args=(args,))
+    # mono card learning
     else:
         main_worker(gpu=args.gpus, args=args)
 
 def main_worker(gpu, args):
-
+    # start multiprocess for distributed learning
     if args.distributed:
         torch.multiprocessing.set_start_method('fork', force=True)
     np.set_printoptions(formatter={'float': '{: 0.3f}'.format}, suppress=True)
+    # assign gpu number
     args.gpu = gpu
+    # init distributed learning
     if args.distributed:
+        # set rank
         args.rank = args.rank * args.ngpus_per_node + gpu
         dist.init_process_group(backend=args.dist_backend,
                                 init_method=args.dist_url,
                                 world_size=args.world_size,
                                 rank=args.rank)
+    # download to card
     torch.cuda.set_device(args.gpu)
     torch.backends.cudnn.benchmark = True
+    # for training mode
     args.test_mode = False
+    # load dataset
     loader = get_loader(args)
     print(args.rank, ' gpu', args.gpu)
+    # print batchsize
     if args.rank == 0:
         print('Batch size is:', args.batch_size, 'epochs', args.max_epochs)
+    # Segment voxel into small voxels for memory efficient learning
     inf_size = [args.roi_x, args.roi_y, args.roi_x]
     pretrained_dir = args.pretrained_dir
+
+    # three types of network for benchmark
     if (args.model_name is None) or args.model_name == 'unetr':
         model = UNETR(
             in_channels=args.in_channels,
@@ -143,21 +157,21 @@ def main_worker(gpu, args):
             dropout_rate=args.dropout_rate)
 
         if args.resume_ckpt:
+            # Transfer Learning loading pretrained weights
             model_dict = torch.load(os.path.join(pretrained_dir, args.pretrained_model_name))
             model_state_dict = model.state_dict()
+            # load corresponding layer weights
             state_dict = {k:v for k,v in model_dict.items() if k in model_state_dict.keys()}
+            # delete output header - for customized task
             del state_dict["out.conv.conv.weight"]
             del state_dict["out.conv.conv.bias"]
+            # update params to networks to be trained
             model_state_dict.update(state_dict)
             model.load_state_dict(model_state_dict)
             print('Use pretrained weights')
 
-        if args.resume_jit:
-            if not args.noamp:
-                print('Training from pre-trained checkpoint does not support AMP\nAMP is disabled.')
-                args.amp = args.noamp
-            model = torch.jit.load(os.path.join(pretrained_dir, args.pretrained_model_name))
     if (args.model_name is None) or args.model_name == 'unet':
+        # five layers of unet. followed standardized paradigm
         model = UNet(
             spatial_dims=3,
             in_channels=args.in_channels,
@@ -168,18 +182,22 @@ def main_worker(gpu, args):
             up_kernel_size=3,
             num_res_units=0,
             )
+
     if (args.model_name is None) or args.model_name == 'segres':
+        # improved unet architecture
         model = SegResNet(
             spatial_dims=3,
             in_channels=args.in_channels,
             out_channels=args.out_channels,
             upsample_mode="deconv")
 
+    # using dice_loss for loss function
     dice_loss = DiceCELoss(to_onehot_y=True,
                            softmax=True,
                            squared_pred=True,
                            smooth_nr=args.smooth_nr,
                            smooth_dr=args.smooth_dr)
+    # validation pipeline - metric & post process
     post_label = AsDiscrete(to_onehot=True,
                             n_classes=args.out_channels)
     post_pred = AsDiscrete(argmax=True,
@@ -188,42 +206,34 @@ def main_worker(gpu, args):
     dice_acc = DiceMetric(include_background=True,
                           reduction=MetricReduction.MEAN,
                           get_not_nans=True)
+    
+    #using sliding window inference for memory efficient inference
     model_inferer = partial(sliding_window_inference,
                             roi_size=inf_size,
                             sw_batch_size=args.sw_batch_size,
                             predictor=model,
                             overlap=args.infer_overlap)
-
+    # param number
     pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('Total parameters count', pytorch_total_params)
 
     best_acc = 0
     start_epoch = 0
-
-    if args.checkpoint is not None:
-        checkpoint = torch.load(args.checkpoint, map_location='cpu')
-        from collections import OrderedDict
-        new_state_dict = OrderedDict()
-        for k, v in checkpoint['state_dict'].items():
-            new_state_dict[k.replace('backbone.','')] = v
-        model.load_state_dict(new_state_dict, strict=False)
-        if 'epoch' in checkpoint:
-            start_epoch = checkpoint['epoch']
-        if 'best_acc' in checkpoint:
-            best_acc = checkpoint['best_acc']
-        print("=> loaded checkpoint '{}' (epoch {}) (bestacc {})".format(args.checkpoint, start_epoch, best_acc))
-
+    # set model down to card
     model.cuda(args.gpu)
 
     if args.distributed:
         torch.cuda.set_device(args.gpu)
         if args.norm_name == 'batch':
+            # synchronizing batch normalization in distrb.ln.
             model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
         model.cuda(args.gpu)
+        # set parallel.
         model = torch.nn.parallel.DistributedDataParallel(model,
                                                           device_ids=[args.gpu],
                                                           output_device=args.gpu,
                                                           find_unused_parameters=True)
+    # define optimizer
     if args.optim_name == 'adam':
         optimizer = torch.optim.Adam(model.parameters(),
                                      lr=args.optim_lr,
@@ -241,6 +251,7 @@ def main_worker(gpu, args):
     else:
         raise ValueError('Unsupported Optimization Procedure: ' + str(args.optim_name))
 
+    # define schduler (warmup 50 epochs
     if args.lrschedule == 'warmup_cosine':
         scheduler = LinearWarmupCosineAnnealingLR(optimizer,
                                                   warmup_epochs=args.warmup_epochs,
@@ -252,6 +263,7 @@ def main_worker(gpu, args):
             scheduler.step(epoch=start_epoch)
     else:
         scheduler = None
+    # push downstream for learning.
     accuracy = run_training(model=model,
                             train_loader=loader[0],
                             val_loader=loader[1],

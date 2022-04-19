@@ -13,42 +13,29 @@ import os
 import torch
 import numpy as np
 from monai.inferers import sliding_window_inference
-from networks.unetr import UNETR
 from utils.data_utils import get_loader
 from trainer import dice
 import argparse
 import os
-import matplotlib.pyplot as plt
 import time
-import shutil
 import numpy as np
 import torch
-from torch.cuda.amp import GradScaler, autocast
-from tensorboardX import SummaryWriter
 import torch.nn.parallel
-from utils.utils import distributed_all_gather
 import torch.utils.data.distributed
-from monai.data import decollate_batch
 import torch
 import torch.nn.parallel
-import torch.distributed as dist
-import torch.multiprocessing as mp
 import torch.utils.data.distributed
 from monai.inferers import sliding_window_inference
-from monai.losses import DiceLoss, DiceCELoss
-from monai.metrics import DiceMetric
-from monai.utils.enums import MetricReduction
-from monai.transforms import AsDiscrete,Activations,Compose
-from networks.unetr import UNETR
 from utils.data_utils import get_loader
-from trainer import run_training
-from optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
-from functools import partial
+from utils.valid_utils import dice
+from utils.visualization import print_cut_samples,print_heatmap
+from utils.slide_saliency_inference import sliding_saliency_inference
 
 parser = argparse.ArgumentParser(description='UNETR segmentation pipeline')
 parser.add_argument('--pretrained_dir', default='./pretrained_models/', type=str, help='pretrained checkpoint directory')
 parser.add_argument('--data_dir', default='./dataset/', type=str, help='dataset directory')
 parser.add_argument('--json_list', default='dataset_0.json', type=str, help='dataset json file')
+parser.add_argument('--save_img', default='test', type=str, help='image cut save file')
 parser.add_argument('--pretrained_model_name', default='UNETR_model_best_acc.pth', type=str, help='pretrained model name')
 parser.add_argument('--saved_checkpoint', default='ckpt', type=str, help='Supports torchscript or ckpt pretrained checkpoint type')
 parser.add_argument('--mlp_dim', default=3072, type=int, help='mlp dimention in ViT encoder')
@@ -87,11 +74,16 @@ def main():
                                 rank=0)
     torch.cuda.empty_cache() 
     args = parser.parse_args()
+    # enable test mode
     args.test_mode = True
+    # load data
     val_loader = get_loader(args)
+    # load device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # load model
+    sf=SaliencyInferer("CAM","out.conv.conv")
     pretrained_dir = args.pretrained_dir
     model_name = args.pretrained_model_name
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     pretrained_pth = os.path.join(pretrained_dir, model_name)
     model=torch.load(pretrained_pth)
     '''model = UNETR(
@@ -133,81 +125,37 @@ def main():
             val_inputs, val_labels = (batch["image"].cuda(), batch["label"].cuda())
             img_name = batch['image_meta_dict']['filename_or_obj'][0].split('/')[-1]
             print("Inference on case {}".format(img_name))
+            # sliding windows inference
             val_outputs = sliding_window_inference(val_inputs,
                                                    (96, 96, 96),
                                                    4,
                                                    model,
                                                    overlap=args.infer_overlap)
-            plt.figure("check", (18, 6))
-            plt.subplot(1, 3, 1)
-            plt.title("image")
-            cut = 66
-            plt.imshow(val_inputs.cpu().numpy()[0, 0, :, :, cut], cmap="gray")
-            plt.subplot(1, 3, 2)
-            plt.title("label")
-            plt.imshow(val_labels.cpu().numpy()[0, 0, :, :, cut])
-            plt.subplot(1, 3, 3)
-            plt.title("output")
-            plt.imshow(torch.argmax(val_outputs, dim=1).detach().cpu()[0, :, :, cut])
-            plt.savefig("test1",dpi=300)
+            
+            path=img_name+os.path.split(pretrained_pth,".")[0]
+            print_cut_samples(val_inputs,val_labels,val_outputs,path)
+            salient=sliding_saliency_inference(val_inputs,
+                                                   (96, 96, 96),
+                                                   4,
+                                                   sf,
+                                                   model,
+                                                   overlap=args.infer_overlap)
+            path=img_name+os.path.split(pretrained_pth,".")[0]+"heatmap"
+            print_heatmap(val_inputs,val_labels,val_outputs,salient,path)
+            # postprocess softmax->argmax
             val_outputs = torch.softmax(val_outputs, 1).cpu().numpy()
             val_outputs = np.argmax(val_outputs, axis=1).astype(np.uint8)
             val_labels = val_labels.cpu().numpy()[:, 0, :, :, :]
             dice_list_sub = []
+            # calculate desired metric
             organ_Dice = dice(val_outputs[0] == 1, val_labels[0] == 1)
             dice_list_sub.append(organ_Dice)
             mean_dice = np.mean(dice_list_sub)
             print("Mean Organ Dice: {}".format(mean_dice))
             dice_list_case.append(mean_dice)
             torch.cuda.empty_cache()
+        # ave. metric.
         print("Overall Mean Dice: {}".format(np.mean(dice_list_case)))
-        '''for idx, batch_data in enumerate(val_loader):
-            if isinstance(batch_data, list):
-                data, target = batch_data
-            else:
-                data, target = batch_data['image'], batch_data['label']
-            img_name = batch_data['image_meta_dict']['filename_or_obj'][0].split('/')[-1]
-            print(img_name)
-            print(data.shape)
-            print(target.shape)
-            data, target = data.cuda(0), target.cuda(0)
-            with autocast(enabled=False):
-                if model_inferer is not None:
-                    logits = model_inferer(data)
-                else:
-                    logits = model(data)
-            if not logits.is_cuda:
-                target = target.cpu()
-            plt.figure("check", (18, 6))
-            plt.subplot(1, 3, 1)
-            plt.title("image")
-            cut = 66
-            plt.imshow(data.cpu().numpy()[0, 0, :, :, cut], cmap="gray")
-            plt.subplot(1, 3, 2)
-            plt.title("label")
-            plt.imshow(target.cpu().numpy()[0, 0, :, :, cut])
-            plt.subplot(1, 3, 3)
-            plt.title("output")
-            plt.imshow(torch.argmax(logits, dim=1).detach().cpu()[0, :, :, cut])
-            plt.savefig("test1",dpi=300)
-            val_labels_list = decollate_batch(target)
-            val_labels_convert = [post_label(val_label_tensor) for val_label_tensor in val_labels_list]
-            val_outputs_list = decollate_batch(logits)
-            val_output_convert = [post_pred(val_pred_tensor) for val_pred_tensor in val_outputs_list]
-            acc = dice_acc(y_pred=val_output_convert, y=val_labels_convert)
-            acc = acc.cuda(0)
-            if args.distributed:
-                acc_list = distributed_all_gather([acc],
-                                                  out_numpy=True,
-                                                  is_valid=idx < loader.sampler.valid_length)
-                avg_acc = np.mean([np.nanmean(l) for l in acc_list])
-
-            else:
-                acc_list = acc.detach().cpu().numpy()
-                avg_acc = np.mean([np.nanmean(l) for l in acc_list])
-            print('acc', avg_acc,'time {:.2f}s'.format(time.time() - start_time))
-            start_time = time.time()
-            torch.cuda.empty_cache()'''
 
 if __name__ == '__main__':
     main()
