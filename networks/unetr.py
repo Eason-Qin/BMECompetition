@@ -38,6 +38,7 @@ class UNETR(nn.Module):
         conv_block: bool = False,
         res_block: bool = True,
         dropout_rate: float = 0.0,
+        use_feature: bool = True,
     ) -> None:
         """
         Args:
@@ -83,6 +84,7 @@ class UNETR(nn.Module):
             img_size[2] // self.patch_size[2],
         )
         self.hidden_size = hidden_size
+        self.use_feature = use_feature
         self.classification = False
         self.vit = ViT(
             in_channels=in_channels,
@@ -218,5 +220,18 @@ class UNETR(nn.Module):
         dec2 = self.decoder4(dec3, enc3)
         dec1 = self.decoder3(dec2, enc2)
         out = self.decoder2(dec1, enc1)
+        if self.use_feature:
+            return [dec2,dec1,out]
         logits = self.out(out)
         return logits
+
+
+if __name__ =='__main__':
+
+    device = torch.device('cuda')
+    model=UNETR(1,2,(96,96,96)).to(device)
+    dummy=torch.randn(1, 1, 96, 96,96).float().to(device)
+    up=model(dummy)
+    for i in up:
+        print(i.shape)
+
