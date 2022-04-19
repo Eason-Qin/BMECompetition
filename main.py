@@ -162,10 +162,8 @@ def main_worker(gpu, args):
             model_state_dict = model.state_dict()
             # load corresponding layer weights
             state_dict = {k:v for k,v in model_dict.items() if k in model_state_dict.keys()}
-            # delete output header - for customized task
-            del state_dict["out.conv.conv.weight"]
-            del state_dict["out.conv.conv.bias"]
-            # update params to networks to be trained
+            #del state_dict["out.conv.conv.weight"]
+            #del state_dict["out.conv.conv.bias"]
             model_state_dict.update(state_dict)
             model.load_state_dict(model_state_dict)
             print('Use pretrained weights')
