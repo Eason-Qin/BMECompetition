@@ -9,7 +9,8 @@ from monai.networks.layers.factories import Act, Norm
 from typing import Optional, Sequence, Tuple, Union
 from monai.networks.blocks.dynunet_block import get_padding,get_output_padding,get_norm_layer
 from monai.networks.blocks.segresnet_block import ResBlock, get_conv_layer, get_upsample_layer
-
+from PytorchMemoryUtils.gpu_mem_track import MemTracker
+from PytorchMemoryUtils.modelsize_estimate import modelsize
 
 class TCMix(nn.Module):
     """
@@ -32,7 +33,7 @@ class TCMix(nn.Module):
         self.GN_1 = get_norm_layer(name=("group", {"num_groups": 16}),spatial_dims=3, channels=16)
         self.mixup_layer=get_conv_layer(spatial_dims=3,in_channels=32,out_channels=16,kernel_size=3,stride=1) # add a BN here
         self.out = UnetOutBlock(spatial_dims=3, in_channels=16, out_channels=2)  # type: ignore
-        self.Transformer=UNETR(
+        self.UNETR=UNETR(
             in_channels=1,
             out_channels=2,
             img_size=(96,96,96),
@@ -47,7 +48,7 @@ class TCMix(nn.Module):
             dropout_rate=0,
             use_feature=True)
             
-        self.CNN=SegResNet(
+        self.SegResNet=SegResNet(
             spatial_dims=3,
             in_channels=1,
             out_channels=2,
@@ -63,7 +64,7 @@ class TCMix(nn.Module):
                         get_upsample_layer(3,16, upsample_mode='deconv'),)
         self.upsample_1=nn.Sequential(
                         get_conv_layer(3, 3*16, 16, kernel_size=1),
-                        get_upsample_layer(3, 16, upsample_mode='deconv'),)
+                        )# reduce channel is fine
             
     def _make_align_channel(self,spatial_dim,in_channel,out_channel):
         return get_conv_layer(spatial_dims=spatial_dim,in_channels=in_channel,out_channels=out_channel,kernel_size=1,stride=1)
@@ -88,16 +89,16 @@ class TCMix(nn.Module):
 
     def forward(self, x_in):
         if not self.use_multi_mix:
-            CNNFeature=self.CNN(x_in)
-            TransformerFeature=self.Transformer(x_in)
+            CNNFeature=self.SegResNet(x_in)
+            TransformerFeature=self.UNETR(x_in)
             CNNFeature=self.align_channel(CNNFeature[2])
             Mixed=torch.cat((CNNFeature,TransformerFeature[2]),1)
             Mixed=self.mixup_layer(Mixed)
             Mixed=self.out(Mixed)
             return Mixed
         if self.use_multi_mix:
-            CNNFeature=self.CNN(x_in)
-            TransformerFeature=self.Transformer(x_in)
+            CNNFeature=self.SegResNet(x_in)
+            TransformerFeature=self.UNETR(x_in)
             mix1=self.align_channel_1(CNNFeature[2])#8-16
             mix2=self.align_channel_2(CNNFeature[1])#16-32
             mix3=self.align_channel_3(CNNFeature[0])#32-64
@@ -113,11 +114,18 @@ class TCMix(nn.Module):
             
 
 if __name__ =='__main__':
-    device = torch.device('cuda')
+    device = torch.device('cuda:1')
+    gpu_tracker = MemTracker()
     model=TCMix(_use_multi_mix=True).to(device)
-    dummy=torch.randn(1, 1, 96, 96,96).float().to(device)
+    model.train()
+    gpu_tracker.track()
+    dummy=torch.randn(1, 1, 96, 96, 96).float().to(device)
     x=model(dummy)
-    print(x.shape)
+    gpu_tracker.track()
+    #modelsize(model,dummy)
+    #print(x.shape)
+    for name, param in model.named_parameters():
+        print(name)
         
         
         
