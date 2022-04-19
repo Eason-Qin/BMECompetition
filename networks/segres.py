@@ -56,7 +56,7 @@ class SegResNet(nn.Module):
         blocks_down: tuple = (1, 2, 2, 4),
         blocks_up: tuple = (1, 1, 1),
         upsample_mode: Union[UpsampleMode, str] = UpsampleMode.NONTRAINABLE,
-        using_features: bool = False,
+        using_features: bool = True,
     ):
         super().__init__()
 
@@ -173,7 +173,7 @@ class SegResNet(nn.Module):
         down_x.reverse()
         x, up_x = self.decode(x, down_x)
         if self.using_features:
-            return down_x,up_x    
+            return up_x    
         return x
 
 if __name__ =='__main__':
@@ -185,9 +185,7 @@ if __name__ =='__main__':
             upsample_mode="deconv",
             using_features=True).to(device)
     dummy=torch.randn(1, 1, 96, 96,96).float().to(device)
-    down,up=model(dummy) # up_feature(32,24x3) (16,48x3) (8,96x3)
-    for i in down:
-        print(i.shape)
+    up=model(dummy) # up_feature(32,24x3) (16,48x3) (8,96x3)
     print("up")
     for i in up:
         print(i.shape)
